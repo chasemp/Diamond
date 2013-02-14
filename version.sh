@@ -19,7 +19,7 @@ if [ -z "${VERSION_REV}" ]; then
 fi
 
 #Allow local revision identifiers
-#mimicing backports this is "-<identifier>"
+#mimicing backports this is "~<identifier>"
 if [ -e localversion ]; then
     LOCAL_REV=$(cat localversion)
     if [ -n "${LOCAL_REV}" ];
