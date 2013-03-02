@@ -162,9 +162,16 @@ class Collector(object):
         # Check for config file in config directory
         configfile = os.path.join(config['server']['collectors_config_path'],
                                   cls.__name__) + '.conf'
+
+        #Check for collector.d style configs
+        configd = os.path.join(config['server']['collectors_config_path'], 
+                                  cls.__name__ + '.d')
+
         if os.path.exists(configfile):
             # Merge Collector config file
             self.config.merge(configobj.ConfigObj(configfile))
+        elif os.path.exists(configd):
+            self.config.merge(self.get_dotd_style_config(configd))
 
         # Handle some config file changes transparently
         if isinstance(self.config['byte_unit'], basestring):
@@ -176,6 +183,50 @@ class Collector(object):
             self.config['measure_collector_time'])
 
         self.collect_running = False
+
+    def get_dotd_style_config(self, configd):
+        """
+        Parses a directory of configs like 'Collector.d'
+        Returns a configobj with a 'conf' key index
+        of all config files each of which are dict keys themselves
+        Reads 'init.conf' to determine main collector state
+        """
+        def bool_enable(config_object):
+            """
+            convert configobj dict to boolean
+            """
+            try:
+                config_object['enabled'] = str_to_bool(config_object['enabled'])
+            except KeyError:
+                config_object['enabled'] = False
+            finally:
+                return config_object
+            
+        def add_dstyle(param): 
+            configfile = os.path.join(configd, param)
+            param_config = bool_enable(configobj.ConfigObj(configfile))
+            if param_config['enabled'] and not param.startswith('init'):
+                return (param.strip('.conf'), dict(param_config))
+
+        configs = filter(None, map(lambda f: add_dstyle(f), os.listdir(configd)))
+
+        #build a config file index key named 'conf'
+        #merge all config dicts into main configobj
+        values = {}
+        values['conf'] = []
+        for dstyle in configs:
+            values[dstyle[0]] = dstyle[1]
+            values['conf'].append(dstyle[0])
+
+        config = configobj.ConfigObj(values)
+        #load up init.conf to tell collector global state
+        collector_init = os.path.join(configd, 'init.conf')
+        if os.path.exists(collector_init):
+            config.merge(configobj.ConfigObj(collector_init))
+        else:
+            config.merge({'enabled': 'True'})
+
+        return config
 
     def get_default_config_help(self):
         """
