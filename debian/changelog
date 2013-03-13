@@ -1,3 +1,17 @@
+diamond (3.3.304~da-testdastatsd) unstable; urgency=low
+
+  * Last Commit: (2013-03-13 16:22:21 -0700)
+    f1c0ee6d66ae651e76803eddb6fe62a1908a6cab rush <rush@deviantart.com>
+
+ -- root <root@idle25.da>  Wed, 13 Mar 2013 16:23:13 -0700
+
+diamond (3.3.302~da-testdastatsd) unstable; urgency=low
+
+  * Last Commit: (2013-03-13 15:40:12 -0700)
+    fe9c94adf61f7fb3755212b2bebf780e722cb533 root <root@idle25.da>
+
+ -- root <root@idle25.da>  Wed, 13 Mar 2013 16:02:00 -0700
+
 diamond (3.3.194-da) unstable; urgency=low
 
   * Last Commit: (2013-02-13 17:23:15 -0600)
